@@ -59,8 +59,15 @@ app.post("/api/review", async (req, res) => {
     {
       "index": <number>,
       "review": {
-        "score": <number 1-10>,
-        "feedback": "<2-3 sentence review of this specific reel>"
+        "hook_score": <number 1-10>,
+        "clarity_score": <number 1-10>,
+        "pacing_score": <number 1-10>,
+        "cta_score": <number 1-10>,
+        "overall_score": <number 1-10>,
+        "summary": "<2-3 sentence review of this specific reel>",
+        "suggested_hook": "<a better opening hook for this reel>",
+        "suggested_cta": "<a better call-to-action for this reel>",
+        "improvements": ["<improvement 1>", "<improvement 2>", ...]
       }
     }
   ]
@@ -83,13 +90,14 @@ ${JSON.stringify(reelSummaries, null, 2)}`;
     // 4. Merge scraped data with reviews
     const reels = items.map((r, i) => {
       const reelReview = review.reels.find((rv) => rv.index === i + 1) || {
-        review: { score: 0, feedback: "No review available" },
+        review: {},
       };
       return {
         caption: r.caption || "",
         views: r.videoViewCount ?? r.videoPlayCount ?? null,
         likes: r.likesCount ?? null,
         comments: r.commentsCount ?? null,
+        duration: r.videoDuration ?? null,
         review: reelReview.review,
       };
     });

@@ -1,250 +1,802 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Reel Reviewer</title>
 
-<title>Instagram Reel Reviewer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000000;
+      --panel: #0b0b0b;
+      --panel-2: #101010;
+      --border: #232323;
+      --text: #ffffff;
+      --muted: #a6a6a6;
+      --accent: #F92672;
+      --accent-soft: rgba(249, 38, 114, 0.12);
+      --danger: #ff5c7a;
+      --success: #ffffff;
+      --radius: 18px;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
 
-<style>
+    * {
+      box-sizing: border-box;
+    }
 
-*{
-box-sizing:border-box;
-}
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Rethink Sans", sans-serif;
+    }
 
-body{
-background:black;
-color:white;
-font-family:'Rethink Sans',sans-serif;
-max-width:900px;
-margin:auto;
-padding:40px 20px;
-line-height:1.6;
-}
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(249, 38, 114, 0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(249, 38, 114, 0.06), transparent 22%),
+        #000;
+    }
 
-h1{
-font-size:36px;
-margin-bottom:10px;
-color:#F92672;
-}
+    .wrap {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
 
-h2{
-margin-top:0;
-}
+    .hero {
+      margin-bottom: 28px;
+    }
 
-p{
-opacity:0.85;
-}
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 12px;
+      border: 1px solid rgba(249, 38, 114, 0.35);
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
 
-input{
-background:#111;
-border:1px solid #333;
-padding:14px;
-font-size:16px;
-color:white;
-border-radius:6px;
-width:260px;
-}
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(34px, 6vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+      max-width: 850px;
+    }
 
-input:focus{
-outline:none;
-border-color:#F92672;
-}
+    .accent {
+      color: var(--accent);
+    }
 
-button{
-background:#F92672;
-border:none;
-padding:14px 18px;
-font-size:16px;
-border-radius:6px;
-cursor:pointer;
-margin-left:8px;
-font-weight:600;
-}
+    .subtext {
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.6;
+      margin: 0;
+    }
 
-button:hover{
-opacity:0.9;
-}
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
 
-.card{
-background:#0a0a0a;
-border:1px solid #222;
-padding:24px;
-border-radius:12px;
-margin-top:25px;
-}
+    .search-panel {
+      margin-top: 28px;
+      padding: 20px;
+    }
 
-.score{
-font-size:32px;
-font-weight:700;
-color:#F92672;
-margin:10px 0 20px 0;
-}
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
 
-.reel{
-border-top:1px solid #222;
-padding-top:16px;
-margin-top:16px;
-}
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0 16px;
+      min-height: 58px;
+    }
 
-ul{
-padding-left:20px;
-}
+    .input-prefix {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 18px;
+      opacity: 0.95;
+    }
 
-.muted{
-color:#aaa;
-}
+    input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 18px;
+      padding: 16px 0;
+    }
 
-.error{
-color:#ff4b4b;
-margin-top:10px;
-}
+    input::placeholder {
+      color: #777;
+    }
 
-</style>
+    .btn {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      min-height: 58px;
+      padding: 0 22px;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 800;
+      background: var(--accent);
+      color: white;
+      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 14px 28px rgba(249, 38, 114, 0.22);
+      white-space: nowrap;
+    }
 
+    .btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .meta {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status,
+    .error {
+      margin-top: 16px;
+      font-size: 15px;
+    }
+
+    .status {
+      color: var(--muted);
+    }
+
+    .error {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .results {
+      margin-top: 30px;
+      display: grid;
+      gap: 22px;
+    }
+
+    .summary-card {
+      padding: 24px;
+    }
+
+    .summary-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .profile-name {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .profile-name span {
+      color: var(--accent);
+    }
+
+    .verdict {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 720px;
+    }
+
+    .score-badge {
+      min-width: 132px;
+      text-align: center;
+      padding: 18px 16px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(249,38,114,0.16), rgba(249,38,114,0.08));
+      border: 1px solid rgba(249,38,114,0.28);
+    }
+
+    .score-badge .label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .score-badge .value {
+      display: block;
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.05em;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .mini-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .mini-card h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+
+    .mini-card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text);
+    }
+
+    .mini-card li {
+      margin-bottom: 8px;
+      color: var(--muted);
+    }
+
+    .section-title {
+      font-size: 22px;
+      margin: 8px 0 0;
+      letter-spacing: -0.03em;
+    }
+
+    .reels-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .reel-card {
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+
+    .reel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .reel-title {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.03em;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(249, 38, 114, 0.26);
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .caption-box,
+    .summary-box,
+    .suggestion-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-top: 14px;
+    }
+
+    .box-label {
+      display: block;
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .caption-text,
+    .summary-text,
+    .suggestion-text {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      word-break: break-word;
+    }
+
+    .scores-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .score-item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .score-item .k {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .score-item .v {
+      display: block;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.04em;
+    }
+
+    .improvements-list {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    .improvements-list li {
+      color: var(--muted);
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+
+    .empty {
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.01);
+    }
+
+    @media (max-width: 900px) {
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .scores-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .wrap {
+        padding: 28px 16px 60px;
+      }
+
+      .search-row {
+        grid-template-columns: 1fr;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .metrics,
+      .scores-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .score-badge {
+        width: 100%;
+      }
+
+      .summary-top {
+        align-items: stretch;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <section class="hero">
+      <span class="eyebrow">Instagram Reel Review</span>
+      <h1>
+        Review public reels with an
+        <span class="accent">AI-style audit</span>
+      </h1>
+      <p class="subtext">
+        Enter a public Instagram username and analyse recent reels for hook strength, clarity,
+        pacing, CTA quality, and overall content performance.
+      </p>
+    </section>
 
-<h1>Instagram Reel Reviewer</h1>
+    <section class="panel search-panel">
+      <div class="search-row">
+        <div class="input-wrap">
+          <span class="input-prefix">@</span>
+          <input
+            id="username"
+            type="text"
+            value="harankiru"
+            placeholder="Enter Instagram username"
+            autocomplete="off"
+          />
+        </div>
 
-<p class="muted">
-Enter a public Instagram username to analyse their recent reels.
-</p>
+        <button id="reviewBtn" class="btn">Review Reels</button>
+      </div>
 
-<input id="username" value="harankiru" placeholder="@username">
+      <div class="meta">
+        <span>Public accounts only</span>
+        <span>Video review depends on your backend setup</span>
+        <span>Frontend ready for GitHub + Claude Code workflow</span>
+      </div>
 
-<button id="reviewBtn">
-Review Reels
-</button>
+      <div id="status" class="status"></div>
+      <div id="error" class="error"></div>
+    </section>
 
-<div id="status" class="muted" style="margin-top:12px"></div>
+    <section id="results" class="results"></section>
+  </div>
 
-<div id="error" class="error"></div>
+  <script>
+    const usernameInput = document.getElementById("username");
+    const reviewBtn = document.getElementById("reviewBtn");
+    const statusEl = document.getElementById("status");
+    const errorEl = document.getElementById("error");
+    const resultsEl = document.getElementById("results");
 
-<div id="results"></div>
+    function escapeHtml(str = "") {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
 
-<script>
+    function formatNumber(value) {
+      if (value === null || value === undefined || value === "") return "N/A";
+      const num = Number(value);
+      if (Number.isNaN(num)) return escapeHtml(String(value));
+      return new Intl.NumberFormat("en-GB").format(num);
+    }
 
-const btn = document.getElementById("reviewBtn")
-const usernameInput = document.getElementById("username")
-const statusEl = document.getElementById("status")
-const errorEl = document.getElementById("error")
-const resultsEl = document.getElementById("results")
+    function safeArray(value) {
+      return Array.isArray(value) ? value : [];
+    }
 
-function escapeHtml(str=""){
-return str
-.replaceAll("&","&amp;")
-.replaceAll("<","&lt;")
-.replaceAll(">","&gt;")
-.replaceAll('"',"&quot;")
-.replaceAll("'","&#039;")
-}
+    function safeText(value, fallback = "Not available") {
+      if (value === null || value === undefined || value === "") return fallback;
+      return String(value);
+    }
 
-btn.addEventListener("click", async ()=>{
+    function scoreValue(value) {
+      if (value === null || value === undefined || value === "") return "N/A";
+      return escapeHtml(String(value));
+    }
 
-const username = usernameInput.value.trim().replace("@","")
+    function renderSummary(data) {
+      const username = safeText(data.username, "unknown");
+      const summary = data.summary || {};
+      const score = summary.score ?? "N/A";
+      const verdict = safeText(summary.verdict, "No verdict returned.");
 
-errorEl.textContent=""
-resultsEl.innerHTML=""
+      const strengths = safeArray(summary.strengths);
+      const weaknesses = safeArray(summary.weaknesses);
+      const recommendations = safeArray(summary.recommendations);
 
-if(!username){
-errorEl.textContent="Please enter a username"
-return
-}
+      return `
+        <article class="panel summary-card">
+          <div class="summary-top">
+            <div>
+              <h2 class="profile-name">Review for <span>@${escapeHtml(username)}</span></h2>
+              <p class="verdict">${escapeHtml(verdict)}</p>
+            </div>
 
-statusEl.textContent="Reviewing reels..."
+            <div class="score-badge">
+              <span class="label">Overall Score</span>
+              <span class="value">${escapeHtml(String(score))}/10</span>
+            </div>
+          </div>
 
-try{
+          <div class="summary-grid">
+            <div class="mini-card">
+              <h3>Strengths</h3>
+              ${
+                strengths.length
+                  ? `<ul>${strengths.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+                  : `<p class="summary-text">No strengths returned.</p>`
+              }
+            </div>
 
-const res = await fetch("/api/review",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({username})
-})
+            <div class="mini-card">
+              <h3>Weaknesses</h3>
+              ${
+                weaknesses.length
+                  ? `<ul>${weaknesses.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+                  : `<p class="summary-text">No weaknesses returned.</p>`
+              }
+            </div>
 
-const data = await res.json()
+            <div class="mini-card">
+              <h3>Recommendations</h3>
+              ${
+                recommendations.length
+                  ? `<ul>${recommendations.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+                  : `<p class="summary-text">No recommendations returned.</p>`
+              }
+            </div>
+          </div>
+        </article>
+      `;
+    }
 
-if(!res.ok){
-throw new Error(data.error || "Error fetching reels")
-}
+    function renderReelCard(reel, index) {
+      const review = reel.review || {};
 
-statusEl.textContent=""
+      const caption = safeText(reel.caption, "No caption found.");
+      const views = formatNumber(reel.views);
+      const likes = formatNumber(reel.likes);
+      const comments = formatNumber(reel.comments);
+      const duration = reel.duration !== null && reel.duration !== undefined && reel.duration !== ""
+        ? `${escapeHtml(String(reel.duration))}s`
+        : "N/A";
 
-resultsEl.innerHTML = `
+      const hookScore = scoreValue(review.hook_score);
+      const clarityScore = scoreValue(review.clarity_score);
+      const pacingScore = scoreValue(review.pacing_score);
+      const ctaScore = scoreValue(review.cta_score);
+      const overallScore = scoreValue(review.overall_score);
+      const summary = safeText(review.summary, "No review summary returned.");
+      const suggestedHook = safeText(review.suggested_hook, "No suggested hook returned.");
+      const suggestedCta = safeText(review.suggested_cta, "No suggested CTA returned.");
+      const improvements = safeArray(review.improvements);
 
-<div class="card">
+      return `
+        <article class="reel-card">
+          <div class="reel-head">
+            <h3 class="reel-title">Reel ${index + 1}</h3>
+            <div class="pill">Overall: ${overallScore}/10</div>
+          </div>
 
-<h2>@${escapeHtml(data.username)}</h2>
+          <div class="metrics">
+            <div class="metric">
+              <div class="metric-label">Views</div>
+              <div class="metric-value">${views}</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Likes</div>
+              <div class="metric-value">${likes}</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Comments</div>
+              <div class="metric-value">${comments}</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Duration</div>
+              <div class="metric-value">${duration}</div>
+            </div>
+          </div>
 
-<div class="score">
-Overall Score: ${data.summary.score}/10
-</div>
+          <div class="caption-box">
+            <span class="box-label">Caption</span>
+            <p class="caption-text">${escapeHtml(caption)}</p>
+          </div>
 
-<p><strong>Verdict:</strong> ${escapeHtml(data.summary.verdict)}</p>
+          <div class="scores-grid">
+            <div class="score-item">
+              <span class="k">Hook</span>
+              <span class="v">${hookScore}</span>
+            </div>
+            <div class="score-item">
+              <span class="k">Clarity</span>
+              <span class="v">${clarityScore}</span>
+            </div>
+            <div class="score-item">
+              <span class="k">Pacing</span>
+              <span class="v">${pacingScore}</span>
+            </div>
+            <div class="score-item">
+              <span class="k">CTA</span>
+              <span class="v">${ctaScore}</span>
+            </div>
+            <div class="score-item">
+              <span class="k">Overall</span>
+              <span class="v">${overallScore}</span>
+            </div>
+          </div>
 
-<h3 style="color:#F92672">Strengths</h3>
-<ul>
-${data.summary.strengths.map(i=>`<li>${escapeHtml(i)}</li>`).join("")}
-</ul>
+          <div class="summary-box">
+            <span class="box-label">AI Review</span>
+            <p class="summary-text">${escapeHtml(summary)}</p>
 
-<h3 style="color:#F92672">Weaknesses</h3>
-<ul>
-${data.summary.weaknesses.map(i=>`<li>${escapeHtml(i)}</li>`).join("")}
-</ul>
+            ${
+              improvements.length
+                ? `
+                  <ul class="improvements-list">
+                    ${improvements.map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+                  </ul>
+                `
+                : ""
+            }
+          </div>
 
-<h3 style="color:#F92672">Recommendations</h3>
-<ul>
-${data.summary.recommendations.map(i=>`<li>${escapeHtml(i)}</li>`).join("")}
-</ul>
+          <div class="suggestion-box">
+            <span class="box-label">Suggested Hook</span>
+            <p class="suggestion-text">${escapeHtml(suggestedHook)}</p>
+          </div>
 
-<h3 style="margin-top:30px;color:#F92672">Recent Reel Reviews</h3>
+          <div class="suggestion-box">
+            <span class="box-label">Suggested CTA</span>
+            <p class="suggestion-text">${escapeHtml(suggestedCta)}</p>
+          </div>
+        </article>
+      `;
+    }
 
-${data.reels.map(reel=>`
+    function renderResults(data) {
+      const reels = safeArray(data.reels);
 
-<div class="reel">
+      if (!reels.length) {
+        resultsEl.innerHTML = `
+          ${renderSummary(data)}
+          <div class="empty">No reel results were returned for this username.</div>
+        `;
+        return;
+      }
 
-<p>
-<strong>Caption:</strong><br>
-${escapeHtml(reel.caption || "No caption found")}
-</p>
+      resultsEl.innerHTML = `
+        ${renderSummary(data)}
 
-<p class="muted">
-Views: ${reel.views ?? "N/A"} |
-Likes: ${reel.likes ?? "N/A"} |
-Comments: ${reel.comments ?? "N/A"}
-</p>
+        <section>
+          <h2 class="section-title">Recent Reel Reviews</h2>
+        </section>
 
-<p>
-<strong>Score:</strong> ${reel.review.score}/10
-</p>
+        <section class="reels-grid">
+          ${reels.map((reel, index) => renderReelCard(reel, index)).join("")}
+        </section>
+      `;
+    }
 
-<p>
-${escapeHtml(reel.review.feedback)}
-</p>
+    async function reviewReels() {
+      const username = usernameInput.value.trim().replace(/^@+/, "");
 
-</div>
+      errorEl.textContent = "";
+      resultsEl.innerHTML = "";
 
-`).join("")}
+      if (!username) {
+        errorEl.textContent = "Please enter a username.";
+        return;
+      }
 
-</div>
+      reviewBtn.disabled = true;
+      statusEl.textContent = `Reviewing @${username}...`;
 
-`
+      try {
+        const response = await fetch("/api/review", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ username })
+        });
 
-}catch(err){
+        const data = await response.json().catch(() => ({}));
 
-statusEl.textContent=""
-errorEl.textContent = err.message
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to review reels.");
+        }
 
-}
+        statusEl.textContent = "";
+        renderResults(data);
+      } catch (error) {
+        statusEl.textContent = "";
+        errorEl.textContent = error.message || "Something went wrong.";
+      } finally {
+        reviewBtn.disabled = false;
+      }
+    }
 
-})
+    reviewBtn.addEventListener("click", reviewReels);
 
-</script>
-
+    usernameInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        reviewReels();
+      }
+    });
+  </script>
 </body>
 </html>
